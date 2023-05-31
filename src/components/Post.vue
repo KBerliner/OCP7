@@ -2,14 +2,14 @@
     <article class="postcontainer">
         <div class="postheader">
             <h3 class="posttitle">
-                Title Example
+                {{ title }}
             </h3>
             <h5 class="postauthor">
-                Post Author Example
+                {{ username }}
             </h5>
         </div>
         <div class="postbody">
-            <img alt="Post Image" class="postimg" />
+            <img alt="Post Image" class="postimg"/>
             <p class="caption"></p>
         </div>
         <div class="postfooter">
@@ -26,30 +26,171 @@
 </template>
 
 <script>
+import CreatePost from './CreatePost.vue';
+
     export default {
         name: 'Post',
+        components: {
+            CreatePost
+        },
         data() {
             return {
                 owner: false,
-                likes: 0,
-                dislikes: 0,
-                img: String
+            }
+        },
+        props: {
+            title: {
+                type: String,
+                default: 'Test Post'
+            },
+            username: {
+                type: String,
+                default: 'Test User'
+            },
+            caption: {
+                type: String,
+                default: 'Lorem Ipsum something something latin test caption'
+            },
+            likes: {
+                type: Number,
+                default: 0
+            },
+            dislikes: {
+                type: Number,
+                default: 0
+            },
+            imgUrl: {
+                type: String,
+                default: ''
+            },
+            userId: {
+                type: String,
+                default: ''
+            },
+            usersLiked: {
+                type: Array,
+                default: []
+            },
+            usersDisliked: {
+                type: Array,
+                default: []
             }
         },
         methods: {
             like() {
-                this.likes++;
-                return console.log(this.likes);
+                if (!this.usersLiked.includes(this.userId) && !this.usersDisliked.includes(this.userId)) {
+                    return new Promise((resolve, reject) => {
+                        let request = new XMLHttpRequest();
+                        request.open('POST', 'http://localhost:3000/api/like');
+                        request.setRequestHeader('Content-Type', 'application/json');
+                        request.send(JSON.stringify({
+                            like: 1,
+                            userId: this.userId
+                        }));
+                        request.onreadystatechange = () => {
+                            if (request.readyState == 4) {
+                                if (request.status === 200 || request.status === 201) {
+                                    resolve(JSON.parse(request.response));
+                                } else {
+                                    reject(JSON.parse(request.response));
+                                }
+                            }
+                        }
+                    });
+                } else if (this.usersLiked.includes(userId) && !this.usersDisliked.includes(userId)) {
+                    return new Promise((resolve, reject) => {
+                        let request = new XMLHttpRequest();
+                        request.open('POST', 'http://localhost:3000/api/like');
+                        request.setRequestHeader('Content-Type', 'application/json');
+                        request.send(JSON.stringify({
+                            like: 0,
+                            userId: userId
+                        }));
+                        request.onreadystatechange = () => {
+                            if (request.readyState == 4) {
+                                if (request.status === 200 || request.status === 201) {
+                                    resolve(JSON.parse(request.response));
+                                } else {
+                                    reject(JSON.parse(request.response));
+                                }
+                            }
+                        }
+                    });
+                }
             },
             dislike() {
-                this.dislikes++;
-                return console.log(this.dislikes);
+                if (!this.usersLiked.includes(userId) && !this.usersDisliked.includes(userId)) {
+                    return new Promise((resolve, reject) => {
+                        let request = new XMLHttpRequest();
+                        request.open('POST', 'http://localhost:3000/api/like');
+                        request.setRequestHeader('Content-Type', 'application/json');
+                        request.send(JSON.stringify({
+                            like: -1,
+                            userId: userId
+                        }));
+                        request.onreadystatechange = () => {
+                            if (request.readyState == 4) {
+                                if (request.status === 200 || request.status === 201) {
+                                    resolve(JSON.parse(request.response));
+                                } else {
+                                    reject(JSON.parse(request.response));
+                                }
+                            }
+                        }
+                    });
+                } else if (!this.usersLiked.includes(userId) && this.usersDisliked.includes(userId)) {
+                    return new Promise((resolve, reject) => {
+                        let request = new XMLHttpRequest();
+                        request.open('POST', 'http://localhost:3000/api/like');
+                        request.setRequestHeader('Content-Type', 'application/json');
+                        request.send(JSON.stringify({
+                            like: 0,
+                            userId: userId
+                        }));
+                        request.onreadystatechange = () => {
+                            if (request.readyState == 4) {
+                                if (request.status === 200 || request.status === 201) {
+                                    resolve(JSON.parse(request.response));
+                                } else {
+                                    reject(JSON.parse(request.response));
+                                }
+                            }
+                        }
+                    });
+                }
             }
+        },
+
+        // THE PROBLEM MAY BE HERE BECAUSE THIS IS RAN ON CREATION
+
+        mounted() {
+            usersLiked: {
+                    console.log(this.username);
+            }
+            
+            // if (this.usersLiked.includes(userId) && !this.usersDisliked.includes(userId)) {
+            //     let otherBtn = document.getElementsByClassName('dislike');
+            //     let thisBtn = document.getElementsByClassName('like');
+            //     otherBtn.classList.add('disabled');
+            //     otherBtn.removeAttribute('@click');
+            //     thisBtn.setAttribute('@click', 'like')
+            // } else if (!this.usersliked.includes(userId) && this.usersDisliked.includes(userId)) {
+            //     let otherBtn = document.getElementsByClassName('like');
+            //     let thisBtn = document.getElementsByClassName('dislike');
+            //     otherBtn.classList.add('disabled');
+            //     otherBtn.removeAttribute('@click');
+            //     thisBtn.setAttribute('@click', 'dislike');
+            // };
         }
     }
 </script>
 
 <style scoped>
+    .disabled {
+        color: gray;
+        cursor: none;
+    }
+
     .postcontainer {
         width: 45vw;
         height: 60vh;
@@ -59,6 +200,7 @@
         flex-direction: column;
         justify-content: space-around;
         align-items: center;
+        margin: 25px;
     }
 
     .postheader {
