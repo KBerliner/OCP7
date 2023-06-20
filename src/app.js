@@ -14,6 +14,7 @@ const path = require('path');
 
 const userRoutes = require('./routes/user');
 const postRoutes = require('./routes/post');
+const persistRoutes = require('./routes/persist');
 
 app.use(express.json());
 
@@ -42,6 +43,7 @@ app.use((req, res, next) => {
 
 app.use('/api/', postRoutes);
 app.use('/api/', userRoutes);
+app.use('/api/', persistRoutes);
 
 // Export
 

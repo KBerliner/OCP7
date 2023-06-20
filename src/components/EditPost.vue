@@ -17,76 +17,13 @@
 </template>
 
 <script>
-
     export default {
-        name: 'CreatePost',
-        data() {
-            return {
-                title: {
-                    type: String,
-                    default: ''
-                },
-                caption: {
-                    type: String,
-                    default: ''
-                },
-                imgUrl: {
-                    type: String,
-                    default: ''
-                },
-            }
-        },
-        props: {
-            userId: String,
-            username: String
-        },
-        methods: {
-            back() {
-                this.$emit('back');
-            },
-            submitPost($event) {
-                $event.preventDefault;
-                let imgUrl = document.getElementById('imgInput').value;
-                console.log(document.getElementById('imgInput').value);
-                this.$emit('createdPost');
-                let post = JSON.stringify({
-                    title: this.title[0],
-                    username: this.username,
-                    caption: this.caption[0],
-                    image: imgUrl,
-                    likes: this.likes,
-                    dislikes: this.dislikes,
-                    usersLiked: this.usersLiked,
-                    usersDisliked: this.usersDisliked,
-                    creatorId: this.userId
-                });
-                console.log('USER ID: ', this.userId);
-                console.log('PROPS: ', `Title: ${this.title[0]} | Caption: ${this.caption[0]}`);
-                return new Promise((resolve, reject) => {
-                    let key = 'eyJhbGciOiJIUzI1NiJ9.e30.QXKHqZhQAO4ZOTEDRNAxc4CD1jblcF_BakFSjA3srJc';
-                    let request = new XMLHttpRequest();
-                    request.open('POST', 'http://localhost:3000/api/');
-                    request.setRequestHeader('Authorization', 'Bearer ' + key);
-                    request.setRequestHeader('Content-Type', 'application/json');
-                    console.log(post);
-                    request.send(post);
-                    request.onreadystatechange = () => {
-                        if (request.readyState == 4) {
-                            if (request.status === 200 || request.status === 201) {
-                                resolve(JSON.parse(request.response));
-                            } else {
-                                reject(JSON.parse(request.response));
-                            }
-                        }
-                    }
-                })
-            }
-        }
+    name: 'EditPost',
     }
+
 </script>
 
 <style scoped>
-
     #backbtn {
         border-radius: 16px;
         background-color: rgb(194, 89, 93);
@@ -208,5 +145,4 @@
         position: absolute;
         overflow: hidden;
     }
-
 </style>

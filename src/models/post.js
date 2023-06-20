@@ -15,12 +15,16 @@ const postSchema = mongoose.Schema({
         type: String,
         default: ''
     },
+    creatorId: {
+        type: String,
+        default: ''
+    },
     caption: {
         type: String,
         default: ''
         // required: true
     },
-    imageUrl: {
+    image: {
         type: String,
         default: ''
     },
@@ -33,7 +37,8 @@ const postSchema = mongoose.Schema({
         default: 0
     },
     usersLiked: [],
-    usersDisliked: []
+    usersDisliked: [],
+    usersSeen: []
 });
 
 postSchema.plugin(uniqueValidator);

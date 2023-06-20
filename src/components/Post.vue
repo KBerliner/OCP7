@@ -1,27 +1,26 @@
 <template>
-    <article class="postcontainer">
+    <div class="notseen" v-if="!seen">Not Seen</div>
+    <article class="postcontainer" @mouseover="seeing" :key="isVisible">
         <div class="postheader">
             <h3 class="posttitle">
-                {{ title }}
+                {{ post.title }}
             </h3>
             <h5 class="postauthor">
-                {{ username }}
+                {{ post.username }}
             </h5>
         </div>
         <div class="postbody">
-            <img alt="Post Image" class="postimg"/>
-            <p class="caption"></p>
+            <img :src="imgUrl" alt="Post Image" class="postimg" v-if="imgUrl !== ''" />
+            <p class="caption">{{ post.caption }}</p>
         </div>
         <div class="postfooter">
-            <font-awesome-icon :icon="['fas', 'thumbs-up']" size="xl" class="like" @click="like" />
-            <font-awesome-icon :icon="['fas', 'thumbs-down']" size="xl"  class="dislike" @click="dislike" />
-            <button v-if="owner" class="btn modbtn">Modify</button>
-            <button v-if="owner" class="btn deletebtn">Delete</button>
-
+            <font-awesome-icon :icon="['fas', 'thumbs-up']" size="xl" class="like" @click="like" :id="'like' + post._id"/>
+            <h5 class="likesNum" :id="'likesNum' + post._id">{{ post.likes }}</h5>
+            <font-awesome-icon :icon="['fas', 'thumbs-down']" size="xl"  class="dislike" @click="dislike" :id="'dislike' + post._id"/>
+            <h5 class="dislikesNum" :id="'dislikesNum' + post._id">{{ post.dislikes }}</h5>
+            <button v-if="owner" class="btn modbtn" @click="editPost">Modify</button>
+            <button v-if="owner" class="btn deletebtn" @click="deletePost">Delete</button>
         </div>
-        <!-- <div class="ownertools">
-
-        </div> -->
     </article>
 </template>
 
@@ -36,20 +35,33 @@ import CreatePost from './CreatePost.vue';
         data() {
             return {
                 owner: false,
+                isVisible: true,
+                seen: false
             }
         },
         props: {
-            title: {
-                type: String,
-                default: 'Test Post'
+            // isVisible: {
+            //     type: Boolean,
+            //     default: true
+            // },
+            // key: {
+            //     type: String,
+            //     default: ''
+            // },
+            post: {
+
             },
-            username: {
+            userId: {
                 type: String,
-                default: 'Test User'
+                default: ''
             },
-            caption: {
+            imgUrl: {
                 type: String,
-                default: 'Lorem Ipsum something something latin test caption'
+                default: ''
+            },
+            postId: {
+                type: String,
+                default: ''
             },
             likes: {
                 type: Number,
@@ -59,14 +71,6 @@ import CreatePost from './CreatePost.vue';
                 type: Number,
                 default: 0
             },
-            imgUrl: {
-                type: String,
-                default: ''
-            },
-            userId: {
-                type: String,
-                default: ''
-            },
             usersLiked: {
                 type: Array,
                 default: []
@@ -74,14 +78,24 @@ import CreatePost from './CreatePost.vue';
             usersDisliked: {
                 type: Array,
                 default: []
+            },
+            // seen: {
+            //     type: Boolean,
+            //     default: false
+            // },
+            usersSeen: {
+                type: Array
             }
         },
         methods: {
             like() {
-                if (!this.usersLiked.includes(this.userId) && !this.usersDisliked.includes(this.userId)) {
+                // console.log(this.post.usersLiked);
+                if (!this.post.usersLiked.includes(this.userId) && !this.post.usersDisliked.includes(this.userId)) {
                     return new Promise((resolve, reject) => {
+                        let uid = this.postId;
+                        console.log('POST ID: ', uid);
                         let request = new XMLHttpRequest();
-                        request.open('POST', 'http://localhost:3000/api/like');
+                        request.open('POST', `http://localhost:3000/api/${uid}/like`);
                         request.setRequestHeader('Content-Type', 'application/json');
                         request.send(JSON.stringify({
                             like: 1,
@@ -90,6 +104,7 @@ import CreatePost from './CreatePost.vue';
                         request.onreadystatechange = () => {
                             if (request.readyState == 4) {
                                 if (request.status === 200 || request.status === 201) {
+                                    location.reload();
                                     resolve(JSON.parse(request.response));
                                 } else {
                                     reject(JSON.parse(request.response));
@@ -97,18 +112,20 @@ import CreatePost from './CreatePost.vue';
                             }
                         }
                     });
-                } else if (this.usersLiked.includes(userId) && !this.usersDisliked.includes(userId)) {
+                } else if (this.post.usersLiked.includes(this.userId) && !this.post.usersDisliked.includes(this.userId)) {
                     return new Promise((resolve, reject) => {
+                        let uid = this.postId;
                         let request = new XMLHttpRequest();
-                        request.open('POST', 'http://localhost:3000/api/like');
+                        request.open('POST', `http://localhost:3000/api/${uid}/like`);
                         request.setRequestHeader('Content-Type', 'application/json');
                         request.send(JSON.stringify({
                             like: 0,
-                            userId: userId
+                            userId: this.userId
                         }));
                         request.onreadystatechange = () => {
                             if (request.readyState == 4) {
                                 if (request.status === 200 || request.status === 201) {
+                                    location.reload();
                                     resolve(JSON.parse(request.response));
                                 } else {
                                     reject(JSON.parse(request.response));
@@ -119,18 +136,20 @@ import CreatePost from './CreatePost.vue';
                 }
             },
             dislike() {
-                if (!this.usersLiked.includes(userId) && !this.usersDisliked.includes(userId)) {
+                if (!this.post.usersLiked.includes(this.userId) && !this.post.usersDisliked.includes(this.userId)) {
                     return new Promise((resolve, reject) => {
+                        let uid = this.postId;
                         let request = new XMLHttpRequest();
-                        request.open('POST', 'http://localhost:3000/api/like');
+                        request.open('POST', `http://localhost:3000/api/${uid}/like`);
                         request.setRequestHeader('Content-Type', 'application/json');
                         request.send(JSON.stringify({
                             like: -1,
-                            userId: userId
+                            userId: this.userId
                         }));
                         request.onreadystatechange = () => {
                             if (request.readyState == 4) {
                                 if (request.status === 200 || request.status === 201) {
+                                    location.reload();
                                     resolve(JSON.parse(request.response));
                                 } else {
                                     reject(JSON.parse(request.response));
@@ -138,18 +157,20 @@ import CreatePost from './CreatePost.vue';
                             }
                         }
                     });
-                } else if (!this.usersLiked.includes(userId) && this.usersDisliked.includes(userId)) {
+                } else if (!this.post.usersLiked.includes(this.userId) && this.post.usersDisliked.includes(this.userId)) {
                     return new Promise((resolve, reject) => {
                         let request = new XMLHttpRequest();
-                        request.open('POST', 'http://localhost:3000/api/like');
+                        let uid = this.postId;
+                        request.open('POST', `http://localhost:3000/api/${uid}/like`);
                         request.setRequestHeader('Content-Type', 'application/json');
                         request.send(JSON.stringify({
                             like: 0,
-                            userId: userId
+                            userId: this.userId
                         }));
                         request.onreadystatechange = () => {
                             if (request.readyState == 4) {
                                 if (request.status === 200 || request.status === 201) {
+                                    location.reload();
                                     resolve(JSON.parse(request.response));
                                 } else {
                                     reject(JSON.parse(request.response));
@@ -158,31 +179,86 @@ import CreatePost from './CreatePost.vue';
                         }
                     });
                 }
+            },
+            seeing() {
+                if (this.post.usersSeen) {
+                    if (!this.post.usersSeen.includes(this.userId)) {
+                        this.post.usersSeen.push(this.userId);
+                        return new Promise((resolve, reject) => {
+                            let request = new XMLHttpRequest();
+                            let uid = this.postId;
+                            request.open('POST', `http://localhost:3000/api/${uid}/see`);
+                            request.setRequestHeader('Content-Type', 'application/json');
+                            request.send(JSON.stringify({
+                                userId: this.userId
+                            }));
+                            request.onreadystatechange = () => {
+                                if (request.readyState == 4) {
+                                    if (request.status === 200 || request.status === 201) {
+                                        // location.reload();
+                                        resolve(JSON.parse(request.response));
+                                    } else {
+                                        reject(JSON.parse(request.response));
+                                    }
+                                }
+                            }
+                        })
+                    }
+                }
+            //     console.log(this.usersSeen);
+            },
+            editPost() {
+                this.$emit('edit');
+            },
+            deletePost() {
+               return new Promise((resolve, reject) => {
+                let uid = this.postId;
+                let request = new XMLHttpRequest();
+                request.open('DELETE', `http://localhost:3000/api/${uid}/delete`);
+               }) 
+            },
+            test() {
+                console.log('TEST');
             }
         },
-
-        // THE PROBLEM MAY BE HERE BECAUSE THIS IS RAN ON CREATION
-
         mounted() {
-            usersLiked: {
-                    console.log(this.username);
+
+            // If the post has been seen yet by this user
+
+            if (this.post.usersSeen && this.post.usersSeen != undefined) {
+                if (this.post.usersSeen.includes(this.userId)) {
+                    this.seen = true;
+                }
             }
-            
-            // if (this.usersLiked.includes(userId) && !this.usersDisliked.includes(userId)) {
-            //     let otherBtn = document.getElementsByClassName('dislike');
-            //     let thisBtn = document.getElementsByClassName('like');
-            //     otherBtn.classList.add('disabled');
-            //     otherBtn.removeAttribute('@click');
-            //     thisBtn.setAttribute('@click', 'like')
-            // } else if (!this.usersliked.includes(userId) && this.usersDisliked.includes(userId)) {
-            //     let otherBtn = document.getElementsByClassName('like');
-            //     let thisBtn = document.getElementsByClassName('dislike');
-            //     otherBtn.classList.add('disabled');
-            //     otherBtn.removeAttribute('@click');
-            //     thisBtn.setAttribute('@click', 'dislike');
-            // };
+
+            // If the user viewing this post is the owner of the post
+
+            if (this.userId === this.post.creatorId) {
+                    this.owner = true;
+                }
+
+            // If the user has already interacted the post, and which interaction they did (Like or Dislike)
+
+            if (this.post.usersLiked.includes(this.userId) && !this.post.usersDisliked.includes(this.userId)) {
+                let otherBtn = document.getElementById('dislike' + this.post._id);
+                let otherText = document.getElementById('dislikesNum' + this.post._id);
+                let thisBtn = document.getElementById('like' + this.post._id);
+                thisBtn.style.color = "green";
+                otherBtn.style.display = "none";
+                otherText.style.display = "none";
+            } else if (this.post.usersDisliked.includes(this.userId)) {
+                let otherBtn = document.getElementById('like' + this.post._id);
+                let otherText = document.getElementById('likesNum' + this.post._id);
+                let thisBtn = document.getElementById('dislike' + this.post._id);
+                thisBtn.style.color = "red";
+                otherBtn.style.display = "none";
+                otherText.style.display = "none";
+            } else {
+                console.log('YOU HAVENT LIKED THIS YET');
+            }
         }
     }
+
 </script>
 
 <style scoped>
@@ -191,9 +267,13 @@ import CreatePost from './CreatePost.vue';
         cursor: none;
     }
 
+    .notseen {
+        background-color: rgba(213, 173, 86, 0.1);
+    }
+
     .postcontainer {
         width: 45vw;
-        height: 60vh;
+        min-height: 15vh;
         border: 2px solid gray;
         border-radius: 10px;
         display: flex;
@@ -237,6 +317,7 @@ import CreatePost from './CreatePost.vue';
         justify-content: space-around;
         /* border: 2px solid red; */
         align-items: center;
+        padding: 2vh 0;
     }
 
     .postfooter font-awesome-icon:hover {

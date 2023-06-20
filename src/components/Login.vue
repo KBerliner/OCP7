@@ -35,11 +35,35 @@ export default {
             error: false
         }
     },
+    created() {
+
+        // This is to implement "User Persistence"
+
+        if (localStorage) {
+            if (localStorage.getItem('validToken')  && localStorage.getItem('validToken') !== undefined) {
+                let key = JSON.stringify({ key: localStorage.getItem('validToken') });
+                return new Promise((resolve, reject) => {
+                    let request = new XMLHttpRequest();
+                    request.open('POST', 'http://localhost:3000/api/persist');
+                    request.setRequestHeader('Content-Type', 'application/json');
+                    request.send(key);
+                    request.onreadystatechange = () => {
+                        if (request.readyState == 4) {
+                            if (request.status === 200 || request.status === 201) {
+                                this.$emit('login', JSON.parse(request.response).userId, JSON.parse(request.response).username, JSON.parse(request.response).token);
+                                resolve(JSON.parse(request.response));
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    },
     methods: {
         validity() {
             let field = document.getElementsByClassName('txtinput');
             let regexp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-            console.log('Testing...', field[0].value);
+            console.log('Testing...', field[0]);
             if (regexp.test(field[0].value)) {
                 console.log('Valid Email');
                 document.getElementById('submitbtn').removeAttribute('disabled');
@@ -48,26 +72,21 @@ export default {
             }
         },
         login($event) {
-            $event.preventDefault;
-            let user = JSON.stringify({email: this.email, password: this.password});
-            console.log(user);
+            $event.preventDefault();
+            let user = JSON.stringify({ email: this.email, password: this.password });
             return new Promise((resolve, reject) => {
                 let request = new XMLHttpRequest();
                 request.open('POST', 'http://localhost:3000/api/login');
                 request.setRequestHeader('Content-Type', 'application/json');
-                console.log(user);
                 request.send(user);
                 request.onreadystatechange = () => {
                     if (request.readyState == 4) {
                         if (request.status === 200 || request.status === 201) {
                             this.error = false;
-                            console.log('UID: ', JSON.parse(request.response).userId);
                             this.$emit('login', JSON.parse(request.response).userId, JSON.parse(request.response).username, JSON.parse(request.response).token);
                             resolve(JSON.parse(request.response));
                         } else {
                             this.error = true;
-                            console.log(this.error);
-                            // reject(JSON.parse(request.response));
                         }
                     }
                 }

@@ -3,11 +3,42 @@
 const Post = require('../models/post');
 const fs = require('fs');
 
+// The "See" Function
+
+exports.see = (req, res, next) => {
+    Post.findOne({ _id: req.params.id }).then(
+        (post) => {
+            // console.log('USERS SEEN ARRAY', req.body);
+            post.usersSeen.push(req.body.userId);
+            Post.updateOne({ _id: req.params.id }, post).then(
+                () => {
+                    res.status(201).json({
+                        message: 'Seen!',
+                    });
+                }
+            ).catch(
+                (error) => {
+                    res.status(400).json({
+                        error: error
+                    });
+                }
+            );
+        }
+    ).catch(
+        (error) => {
+            res.status(500).json({
+                error: error
+            });
+        }
+    )
+}
+
 // The "Like" and "Dislike" Function
 
 exports.likePost = (req, res, next) => {
     Post.findOne({ _id: req.params.id }).then(
         (post) => {
+            console.log(post);
             if (req.body.like == 1) {
                     post.likes++;
                     post.usersLiked.push(req.body.userId);
@@ -50,12 +81,14 @@ exports.likePost = (req, res, next) => {
 exports.createPost = (req, res, next) => {
     const url = req.protocol + '://' + req.get('host');
     // req.body.post = JSON.parse(req.body.post);
-    if (req.body.imageUrl) {
+    if (req.body.image && req.file) {
+        // console.log(req.file);
         const post = new Post({
             title: req.body.title,
             username: req.body.username,
             caption: req.body.caption,
-            imageUrl: url + '/images/' + req.file.filename,
+            creatorId: req.body.creatorId,
+            image: url + '/images/' + req.file.filename,
             likes: 0,
             dislikes: 0,
             usersLiked: [],
@@ -75,10 +108,12 @@ exports.createPost = (req, res, next) => {
             }
         );
     } else {
+        console.log(req.body);
         const post = new Post({
             title: req.body.title,
             username: req.body.username,
             caption: req.body.caption,
+            creatorId: req.body.creatorId,
             likes: 0,
             dislikes: 0,
             usersLiked: [],
@@ -87,7 +122,8 @@ exports.createPost = (req, res, next) => {
         post.save().then(
             () => {
                 res.status(201).json({
-                    message: 'Created!'
+                    message: 'Created!',
+                    message: req.body
                 });
             }
         ).catch(
@@ -129,7 +165,7 @@ exports.updatePost = (req, res, next) => {
             title: req.body.title,
             username: req.body.username,
             caption: req.body.caption,
-            imageUrl: url + '/images/' + req.file.filename,
+            image: url + '/images/' + req.file.filename,
         };
 
     } else {
@@ -137,7 +173,7 @@ exports.updatePost = (req, res, next) => {
             title: req.body.title,
             username: req.body.username,
             caption: req.body.caption,
-            imageUrl: req.body.imageUrl
+            image: req.body.image
         };
     }
 
@@ -166,7 +202,7 @@ exports.deletePost = (req, res, next) => {
                     error: new Error('No such thing!')
                 });
             }
-            if (post.userId !== req.auth.userId) {
+            if (post.creatorId !== req.auth.userId) {
                 return res.status(400).json({
                     error: new Error('Unauthorized request!')
                 });
@@ -175,7 +211,7 @@ exports.deletePost = (req, res, next) => {
     )
     Post.findOne({ _id: req.params.id }).then(
         (post) => {
-            const filename = post.imageUrl.split('/images/')[1];
+            const filename = post.image.split('/images/')[1];
             fs.unlink('images/' + filename, () => {
                 Post.deleteOne({ _id: req.params.id }).then(
                     () => {

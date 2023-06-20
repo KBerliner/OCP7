@@ -44,7 +44,10 @@ export default{
       this.loggedIn = true;
       this.userId = uid;
       this.username = username;
-      localStorage.setItem('validToken', token);
+      if (localStorage) {
+        // console.log(localStorage);
+        localStorage.setItem('validToken', token);
+      }
     },
     logout() {
       this.loggedIn = false;

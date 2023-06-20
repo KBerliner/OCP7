@@ -1,7 +1,15 @@
 <template class="template">
-    <CreatePost v-if="creatingPostNow" class="createpostframe" :username="username" @createdPost="this.creatingPostNow = false"></CreatePost>
+
+    <!-- These 3 elements are elements that show up when a new small page is needed, like viewing the profile or editing/creating a post -->
+
+    <CreatePost v-if="creatingPostNow" class="createpostframe" @back="creatingPostNow = false" :userId="userId" :username="username" @createdPost="this.creatingPostNow = false"></CreatePost>
+    <EditPost v-if="editingPostNow" class="editpostframe" @back="editingPostNow = false"></EditPost>
+    <Profile v-if="viewingProfile" :userId="userId" @back="viewingProfile = false;"></Profile>
+
+
+
     <section class="header">
-        <h3 class="username headertext">
+        <h3 id="usernamebtn" class="username headertext" @click="viewingProfile = true">
             {{ username }}
         </h3>
         <h1 class="headertext">
@@ -11,10 +19,24 @@
             Logout
         </h4>
     </section>
-    <section class="posts">
-        <div v-if="postArray.length > 0">
-            <Post v-for="post in postArray.length" v-bind:key="post.id">{{ post }}</Post>
+    <section>
+
+        <!-- These are where all the posts are generated -->
+
+        <div v-if="postArray.length > 0" class="posts">
+            <Post  
+            v-for="post in postArray.length" 
+            :key="postArray[post - 1]._id" 
+            :postId="postArray[post - 1]._id" 
+            :post="postArray[post - 1]"
+            :userId="userId"
+            >
+            {{ post }}
+        </Post>
         </div>
+
+
+
         <div v-if="postArray.length == 0">
             <h1>There are no posts yet!</h1>
         </div>
@@ -25,17 +47,23 @@
 <script>
 import Post from '../components/Post.vue';
 import CreatePost from './CreatePost.vue';
+import EditPost from './EditPost.vue';
+import Profile from './Profile.vue';
 
 export default {
     name: 'MainPage',
     components: {
         Post,
-        CreatePost
+        CreatePost,
+        EditPost,
+        Profile
     },
     data() {
         return {
             postArray: [],
-            creatingPostNow: false
+            creatingPostNow: false,
+            editingPostNow: false,
+            viewingProfile: false
         };
     },
     props: {
@@ -51,11 +79,10 @@ export default {
         },
         creatingPost() {
             this.creatingPostNow = true;
-            console.log(this.creatingPostNow);
-            // console.log(this.postArray.PromiseResult);
         }
     },
     created: function() {
+        console.log(this.userId);
         let key = localStorage.getItem('validToken');
             return new Promise((resolve, reject) => {
                 let request = new XMLHttpRequest();
@@ -74,29 +101,7 @@ export default {
                     }
                 }
             });
-    },
-    // mounted() {
-        // getAllPosts() {
-        //     let key = 'eyJhbGciOiJIUzI1NiJ9.e30.QXKHqZhQAO4ZOTEDRNAxc4CD1jblcF_BakFSjA3srJc';
-        //     return new Promise((resolve, reject) => {
-        //         let request = new XMLHttpRequest();
-        //         request.open('GET', 'http://localhost:3000/api/');
-        //         request.setRequestHeader('Authorization', 'Bearer ' + key)
-        //         request.send();
-        //         request.onreadystatechange = () => {
-        //             if (request.readyState == 4) {
-        //                 if (request.status === 200 || request.status === 201) {
-        //                     this.postArray = Promise.all(JSON.parse(request.response));
-        //                     console.log(this.postArray);
-        //                     resolve(JSON.parse(request.response));
-        //                 } else {
-        //                     reject(JSON.parse(request.response));
-        //                 };
-        //             };
-        //         }
-        //     });
-        // }
-    // }
+    }
 }
 </script>
 
@@ -121,6 +126,11 @@ export default {
         text-decoration: underline;
     }
 
+    #usernamebtn:hover {
+        cursor: pointer;
+        text-decoration: underline;
+    }
+
     .headertext {
         width: 200px;
         text-align: center;
@@ -128,7 +138,7 @@ export default {
 
     .posts {
         display: flex;
-        flex-direction: column;
+        flex-direction: column-reverse;
         align-items: center;
         margin: 60px;
     }
@@ -150,8 +160,4 @@ export default {
         align-self: flex-end;
         cursor: pointer;
     }
-
-    /* .createpostframe {
-
-    } */
 </style>

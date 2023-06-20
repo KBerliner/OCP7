@@ -16,6 +16,7 @@ router.post('/', auth, multer, postCtrl.createPost);
 router.put('/:id', auth, multer, postCtrl.updatePost);
 router.delete('/:id', auth, postCtrl.deletePost);
 router.post('/:id/like', postCtrl.likePost);
+router.post('/:id/see', postCtrl.see);
 
 // Exporting routes
 
