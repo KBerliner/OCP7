@@ -35,8 +35,8 @@ export default{
     return {
       loggedIn: false,
       signup: false,
-      userId: 'TestID',
-      username: 'TestUserName'
+      userId: '',
+      username: ''
     };
   },
   methods: {

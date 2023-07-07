@@ -1,7 +1,7 @@
 <template>
     <div class="background">
         <article class="loginScreen">
-            <form>
+            <form class="form">
                 <label>
                     Email:
                 </label>
@@ -121,5 +121,15 @@ export default {
 
     .error {
         color: red;
+    }
+
+    .form {
+        height: 50%;
+        width: 80%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        margin: 5vh auto;
     }
 </style> 

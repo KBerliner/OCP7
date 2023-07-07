@@ -189,15 +189,6 @@
         max-width: 100%;
     }
 
-    /* .label:before { */
-        /* content: '';
-        color: rgb(194, 89, 93);
-        background-color: rgb(194, 89, 93);
-        width: 10%;
-        height: 2px; */
-        /* position: absolute; */
-    /* } */
-
     .background {
         width: 100vw;
         height: 100vh;

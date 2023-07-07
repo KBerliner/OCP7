@@ -203,6 +203,7 @@ exports.updatePost = (req, res, next) => {
 // The "Delete" Function
 
 exports.deletePost = (req, res, next) => {
+    
     Post.findOne({ _id: req.params.id }).then(
         (post) => {
             if (!post) {
@@ -237,6 +238,24 @@ exports.deletePost = (req, res, next) => {
             });
         }
     );
+}
+
+// The function to delete all specific posts
+
+exports.deleteThese = (req, res, next) => {
+    Post.deleteMany({ creatorId: req.params.creatorId }).then(
+        () => {
+            res.status(200).json({
+                message: 'Deleted!'
+            })
+        }
+    ).catch(
+        (error) => {
+            res.status(400).json({
+                error: error
+            })
+        }
+    )
 }
 
 // The function to retrieve ALL posts

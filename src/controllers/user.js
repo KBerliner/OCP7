@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const Post = require('../models/post');
 
 // The "Signup" Function
 
@@ -84,23 +85,21 @@ exports.login = (req, res, next) => {
 // The "Delete" Function
 
 exports.delete = (req, res, next) => {
-  // User.findOne({ userId: req.body.userId }).then(
-  //   (user) => {
-  //     if (!user) {
-  //       return res.status(404).json({
-  //         error: new Error('No such user!')
-  //       });
-  //     };
-  //     if (user.userId !== req.auth.userId) {
-  //       return res.status(400).json({
-  //         error: new Error('Unauthorized request!')
-  //       });
-  //     };
-  //   }
-  // );
-  User.findOne({ userId: req.body.userId }).then(
+  Post.deleteMany({ creatorId: req.params.id}).then(
+    (posts) => {
+      console.log(posts);
+      console.log(req.params.id);
+    }
+  ).catch(
+    (error) => {
+      res.status(400).json({
+        error: error
+      })
+    }
+  );
+  User.findOne({ userId: req.body.params }).then(
     (user) => {
-      User.deleteOne({ userId: req.body.userId }).then(
+      User.deleteOne({ userId: req.params.userId }).then(
         () => {
           res.status(200).json({
             message: 'Deleted!'

@@ -2,7 +2,7 @@
     <div class="background">
         <article class="postcontainer">
             <button id="back" @click="back">X</button>
-            <button id="deletebtn" @click="deleteAccount">
+            <button id="deletebtn" @click="deleteAccount();">
                 DELETE ACCOUNT
             </button>
         </article>
@@ -24,8 +24,30 @@ export default {
         back() {
             this.$emit('back');
         },
+        // deletePosts() {
+            // return new Promise((resolve, reject) => {
+            //     let userId = this.userId;
+            //     let key = localStorage.getItem('validToken');
+            //     let request = new XMLHttpRequest();
+            //     request.open('DELETE', `http://localhost:3000/api/${userId}/deleteThese`);
+            //     request.setRequestHeader('Content-Type', 'application/json');
+            //     request.setRequestHeader('Authorization', 'Bearer ' + key)
+            //     request.send();
+            //     request.onreadystatechange = () => {
+            //             if (request.readyState == 4) {
+            //                 if (request.status === 200 || request.status === 201) {
+            //                     location.reload();
+            //                     resolve(JSON.parse(request.response));
+            //                 } else {
+            //                     reject(JSON.parse(request.response));
+            //                 }
+            //             }
+            //     }
+            // })
+        // },
         deleteAccount() {
             if (confirm('Are you sure?') == true) {
+                // this.deletePosts();
                 return new Promise((resolve, reject) => {
                     let userId = this.userId;
                     let key = localStorage.getItem('validToken');
@@ -43,7 +65,7 @@ export default {
                                     reject(JSON.parse(request.response));
                                 }
                             }
-                        }
+                    }
                 })
             }
         }

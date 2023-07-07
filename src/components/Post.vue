@@ -277,8 +277,21 @@ import CreatePost from './CreatePost.vue';
     }
 
     .notseen {
+        border-radius: 5px;
+        padding: 1vw;
         background-color: rgba(213, 173, 86, 0.1);
     }
+
+    /* .notseen::before {
+        content: '';
+        width: 20px;
+        height: 20px;
+        border-radius: 100px;
+        position: relative;
+        bottom: 500px;
+        border: 2px solid red;
+        background-color: rgba(213, 173, 86, 0.1);
+    } */
 
     .postcontainer {
         width: 45vw;
