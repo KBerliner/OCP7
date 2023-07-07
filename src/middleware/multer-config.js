@@ -2,6 +2,8 @@
 
 const multer = require('multer');
 
+console.log('Multer middleware has been activated.');
+
 // File Extension Possibilites
 
 const MIME_TYPES = {
@@ -14,9 +16,11 @@ const MIME_TYPES = {
 
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
-        callback(null, 'images/');
+        console.log('Multer middleware destination:', file);
+        callback(null, 'images');
     },
     filename: (req, file, callback) => {
+        console.log('Multer middleware filename:', req.body);
         const name = file.originalname.split(' ').join('_');
         const extension = MIME_TYPES[file.mimetype];
         callback(null, name + Date.now() + '.' + extension);

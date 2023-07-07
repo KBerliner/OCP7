@@ -32,6 +32,9 @@ import CreatePost from './CreatePost.vue';
         components: {
             CreatePost
         },
+        emits: {
+            editing: null
+        },
         data() {
             return {
                 owner: false,
@@ -208,13 +211,27 @@ import CreatePost from './CreatePost.vue';
             //     console.log(this.usersSeen);
             },
             editPost() {
-                this.$emit('edit');
+                this.$emit('editing', this.postId);
             },
             deletePost() {
                return new Promise((resolve, reject) => {
+                let key = localStorage.getItem('validToken');
                 let uid = this.postId;
                 let request = new XMLHttpRequest();
-                request.open('DELETE', `http://localhost:3000/api/${uid}/delete`);
+                request.open('DELETE', `http://localhost:3000/api/${uid}`);
+                request.setRequestHeader('Content-Type', 'application/json');
+                request.setRequestHeader('Authorization', 'Bearer ' + key);
+                request.send();
+                request.onreadystatechange = () => {
+                    if (request.readyState == 4) {
+                                if (request.status === 200 || request.status === 201) {
+                                    location.reload();
+                                    resolve(JSON.parse(request.response));
+                                } else {
+                                    reject(JSON.parse(request.response));
+                                }
+                            }
+                }
                }) 
             },
             test() {

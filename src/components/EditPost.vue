@@ -3,12 +3,15 @@
     <article class="postcontainer">
         <div id="backbtn" @click="back">X</div>
         <form class="inputs">
+
+            <!-- Fix the v-model Data Below -->
+
             <label class="titlelabel label">Title: </label>
-            <input class="titleinput input" v-model="title[0]" @click="test" />
+            <input class="titleinput input" v-model="title[0]" @click="test"/>
             <label class="captionlabel label">Post Caption: </label>
             <textarea class="captioninput input" v-model="caption[0]" @click="test" />
             <label class="imagelabel label">Image: </label>
-            <input id="imgInput" type="file" name="image"/>
+            <input id="imgInput" type="file" name="image" @change="handleImageUpload($event)"/>
             <button type="submit" @click="submitPost" id="submit">Submit Post</button>
         </form>
         
@@ -19,7 +22,74 @@
 <script>
     export default {
     name: 'EditPost',
+    data() {
+        return {
+            title: {
+                type: String,
+                default: ''
+            },
+            caption: {
+                type: String,
+                default: ''
+            },
+            image: {
+                type: String,
+                default: ''
+            }
+        }
+    },
+    props: {
+        id: String
+    },
+    methods: {
+        back() {
+            this.$emit('back');
+        },
+        handleImageUpload($event) {
+            this.image = $event.target.files[0];
+            console.log('THIS IS THE POST INFO: ', this.title[0] + ' ' + this.caption[0]);
+        },
+        submitPost($event) {
+            $event.preventDefault();
+
+            let form = document.getElementById('form');
+            const formData = new FormData();
+
+            this.$emit('editedPost');
+            let post = JSON.stringify({
+                title: this.title[0],
+                caption: this.caption[0],
+            });
+
+            formData.append("post", post);
+            formData.append("image", this.image);
+
+            return new Promise((resolve, reject) => {
+                    let key = localStorage.getItem('validToken');
+                    let request = new XMLHttpRequest();
+                    request.open('PUT', `http://localhost:3000/api/${this.id}`);
+                    request.setRequestHeader('Authorization', 'Bearer ' + key);
+                    // request.setRequestHeader('Content-Type', 'multipart/form-data');
+                    // console.log(post);
+                    request.send(formData);
+                    request.onreadystatechange = () => {
+                        if (request.readyState == 4) {
+                            if (request.status === 200 || request.status === 201) {
+                                location.reload();
+                                resolve(JSON.parse(request.response));
+                            } else {
+                                reject(JSON.parse(request.response));
+                            }
+                        }
+                    }
+                })
+        },
+        test() {
+            console.log('THE TITLE: ', this.title[0]);
+            console.log('THE CAPTION: ', this.caption[0]);
+        }
     }
+}
 
 </script>
 

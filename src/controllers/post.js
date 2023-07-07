@@ -80,15 +80,16 @@ exports.likePost = (req, res, next) => {
 
 exports.createPost = (req, res, next) => {
     const url = req.protocol + '://' + req.get('host');
-    // req.body.post = JSON.parse(req.body.post);
-    if (req.body.image && req.file) {
-        // console.log(req.file);
+    console.log('Request file: ', req.file);
+    const postBody = JSON.parse(req.body.post);
+    if (req.file) {
+        console.log('WITH FILE: ');
         const post = new Post({
-            title: req.body.title,
-            username: req.body.username,
-            caption: req.body.caption,
-            creatorId: req.body.creatorId,
-            image: url + '/images/' + req.file.filename,
+            title: postBody.title,
+            username: postBody.username,
+            caption: postBody.caption,
+            creatorId: postBody.creatorId,
+            image: url + '/' + req.file.path,
             likes: 0,
             dislikes: 0,
             usersLiked: [],
@@ -108,12 +109,12 @@ exports.createPost = (req, res, next) => {
             }
         );
     } else {
-        console.log(req.body);
+        console.log('WITHOUT FILE: ');
         const post = new Post({
-            title: req.body.title,
-            username: req.body.username,
-            caption: req.body.caption,
-            creatorId: req.body.creatorId,
+            title: postBody.title,
+            username: postBody.username,
+            caption: postBody.caption,
+            creatorId: postBody.creatorId,
             likes: 0,
             dislikes: 0,
             usersLiked: [],
@@ -158,22 +159,21 @@ exports.getOnePost = (req, res, next) => {
 
 exports.updatePost = (req, res, next) => {
     let post = new Post({ _id: req.params.id });
+    const postBody = JSON.parse(req.body.post);
     if (req.file) {
         const url = req.protocol + '://' + req.get('host');
-        req.body.post = JSON.parse(req.body.post);
         post = {
-            title: req.body.title,
-            username: req.body.username,
-            caption: req.body.caption,
-            image: url + '/images/' + req.file.filename,
+            title: postBody.title,
+            username: postBody.username,
+            caption: postBody.caption,
+            image: url + '/' + req.file.path,
         };
 
     } else {
         post = {
-            title: req.body.title,
-            username: req.body.username,
-            caption: req.body.caption,
-            image: req.body.image
+            title: postBody.title,
+            caption: postBody.caption,
+            image: postBody.image
         };
     }
 

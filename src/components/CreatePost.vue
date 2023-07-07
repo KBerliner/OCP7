@@ -2,13 +2,13 @@
     <div class="background">
     <article class="postcontainer">
         <div id="backbtn" @click="back">X</div>
-        <form class="inputs">
+        <form id="form" class="inputs" method="post" enctype="multipart/form-data">
             <label class="titlelabel label">Title: </label>
             <input class="titleinput input" v-model="title[0]" @click="test" />
             <label class="captionlabel label">Post Caption: </label>
             <textarea class="captioninput input" v-model="caption[0]" @click="test" />
             <label class="imagelabel label">Image: </label>
-            <input id="imgInput" type="file" name="image"/>
+            <input id="imgInput" type="file" name="image" accept="image/*" @change="handleFileUpload($event)" />
             <button type="submit" @click="submitPost" id="submit">Submit Post</button>
         </form>
         
@@ -33,7 +33,7 @@
                 imgUrl: {
                     type: String,
                     default: ''
-                },
+                }
             }
         },
         props: {
@@ -41,25 +41,32 @@
             username: String
         },
         methods: {
+            handleFileUpload($event) {
+                console.log('File: ', $event.target.files[0]);
+                this.imgUrl = $event.target.files[0];
+            },
             back() {
                 this.$emit('back');
             },
             submitPost($event) {
-                $event.preventDefault;
-                let imgUrl = document.getElementById('imgInput').value;
-                console.log(document.getElementById('imgInput').value);
+                $event.preventDefault();
+                let form = document.getElementById('form');
+                const formData = new FormData();
+                
+                console.log('FILE: ', this.imgUrl);
                 this.$emit('createdPost');
                 let post = JSON.stringify({
                     title: this.title[0],
                     username: this.username,
                     caption: this.caption[0],
-                    image: imgUrl,
-                    likes: this.likes,
-                    dislikes: this.dislikes,
-                    usersLiked: this.usersLiked,
-                    usersDisliked: this.usersDisliked,
                     creatorId: this.userId
                 });
+
+                formData.append("post", post);
+                formData.append("image", this.imgUrl);
+
+                console.log('FORM DATA: ', formData.size);
+
                 console.log('USER ID: ', this.userId);
                 console.log('PROPS: ', `Title: ${this.title[0]} | Caption: ${this.caption[0]}`);
                 return new Promise((resolve, reject) => {
@@ -67,12 +74,13 @@
                     let request = new XMLHttpRequest();
                     request.open('POST', 'http://localhost:3000/api/');
                     request.setRequestHeader('Authorization', 'Bearer ' + key);
-                    request.setRequestHeader('Content-Type', 'application/json');
+                    // request.setRequestHeader('Content-Type', 'multipart/form-data');
                     console.log(post);
-                    request.send(post);
+                    request.send(formData);
                     request.onreadystatechange = () => {
                         if (request.readyState == 4) {
                             if (request.status === 200 || request.status === 201) {
+                                location.reload();
                                 resolve(JSON.parse(request.response));
                             } else {
                                 reject(JSON.parse(request.response));

@@ -24,21 +24,22 @@ const postSchema = mongoose.Schema({
         default: ''
         // required: true
     },
-    image: {
-        type: String,
-        default: ''
-    },
     likes: {
-        type: Number,
-        default: 0
+        type: Number
     },
     dislikes: {
-        type: Number,
-        default: 0
+        type: Number
     },
-    usersLiked: [],
-    usersDisliked: [],
-    usersSeen: []
+    usersLiked: {
+        type: Array
+    },
+    usersDisliked: {
+        type: Array
+    },
+    usersSeen: {
+        type: Array
+    },
+    image: {}
 });
 
 postSchema.plugin(uniqueValidator);

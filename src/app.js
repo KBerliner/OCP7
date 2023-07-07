@@ -41,6 +41,7 @@ app.use((req, res, next) => {
 
 // API Request Routing
 
+app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/api/', postRoutes);
 app.use('/api/', userRoutes);
 app.use('/api/', persistRoutes);

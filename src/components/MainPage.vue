@@ -3,7 +3,14 @@
     <!-- These 3 elements are elements that show up when a new small page is needed, like viewing the profile or editing/creating a post -->
 
     <CreatePost v-if="creatingPostNow" class="createpostframe" @back="creatingPostNow = false" :userId="userId" :username="username" @createdPost="this.creatingPostNow = false"></CreatePost>
-    <EditPost v-if="editingPostNow" class="editpostframe" @back="editingPostNow = false"></EditPost>
+    <EditPost 
+    v-if="editingPostNow" 
+    class="editpostframe" 
+    :id="this.whichPostEditing"
+    @back="editingPostNow = false"
+    @editedPost="editingPostNow = false"
+    >
+    </EditPost>
     <Profile v-if="viewingProfile" :userId="userId" @back="viewingProfile = false;"></Profile>
 
 
@@ -30,6 +37,8 @@
             :postId="postArray[post - 1]._id" 
             :post="postArray[post - 1]"
             :userId="userId"
+            :imgUrl="postArray[post - 1].image"
+            @editing="editingPost"
             >
             {{ post }}
         </Post>
@@ -63,6 +72,7 @@ export default {
             postArray: [],
             creatingPostNow: false,
             editingPostNow: false,
+            whichPostEditing: null,
             viewingProfile: false
         };
     },
@@ -79,6 +89,15 @@ export default {
         },
         creatingPost() {
             this.creatingPostNow = true;
+        },
+        editingPost(postId) {
+            // this.whichPostIndexEditing = this.postArray.find(post => post._id === postId);
+            this.whichPostEditing = postId;
+            // console.log(this.whichPostIndexEditing);
+            this.editingPostNow = true;
+            console.log(postId);
+            console.log(this.whichPostEditing);
+
         }
     },
     created: function() {
@@ -87,7 +106,7 @@ export default {
             return new Promise((resolve, reject) => {
                 let request = new XMLHttpRequest();
                 request.open('GET', 'http://localhost:3000/api/');
-                request.setRequestHeader('Authorization', 'Bearer ' + key)
+                request.setRequestHeader('Authorization', 'Bearer ' + key);
                 request.send();
                 request.onreadystatechange = () => {
                     if (request.readyState == 4) {
