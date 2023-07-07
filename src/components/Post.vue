@@ -92,11 +92,9 @@ import CreatePost from './CreatePost.vue';
         },
         methods: {
             like() {
-                // console.log(this.post.usersLiked);
                 if (!this.post.usersLiked.includes(this.userId) && !this.post.usersDisliked.includes(this.userId)) {
                     return new Promise((resolve, reject) => {
                         let uid = this.postId;
-                        console.log('POST ID: ', uid);
                         let request = new XMLHttpRequest();
                         request.open('POST', `http://localhost:3000/api/${uid}/like`);
                         request.setRequestHeader('Content-Type', 'application/json');
@@ -208,7 +206,6 @@ import CreatePost from './CreatePost.vue';
                         })
                     }
                 }
-            //     console.log(this.usersSeen);
             },
             editPost() {
                 this.$emit('editing', this.postId);
@@ -233,9 +230,6 @@ import CreatePost from './CreatePost.vue';
                             }
                 }
                }) 
-            },
-            test() {
-                console.log('TEST');
             }
         },
         mounted() {
@@ -270,8 +264,6 @@ import CreatePost from './CreatePost.vue';
                 thisBtn.style.color = "red";
                 otherBtn.style.display = "none";
                 otherText.style.display = "none";
-            } else {
-                console.log('YOU HAVENT LIKED THIS YET');
             }
         }
     }

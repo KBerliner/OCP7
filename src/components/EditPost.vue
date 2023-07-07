@@ -7,9 +7,9 @@
             <!-- Fix the v-model Data Below -->
 
             <label class="titlelabel label">Title: </label>
-            <input class="titleinput input" v-model="title[0]" @click="test"/>
+            <input class="titleinput input" v-model="title[0]" />
             <label class="captionlabel label">Post Caption: </label>
-            <textarea class="captioninput input" v-model="caption[0]" @click="test" />
+            <textarea class="captioninput input" v-model="caption[0]" />
             <label class="imagelabel label">Image: </label>
             <input id="imgInput" type="file" name="image" @change="handleImageUpload($event)"/>
             <button type="submit" @click="submitPost" id="submit">Submit Post</button>
@@ -47,7 +47,6 @@
         },
         handleImageUpload($event) {
             this.image = $event.target.files[0];
-            console.log('THIS IS THE POST INFO: ', this.title[0] + ' ' + this.caption[0]);
         },
         submitPost($event) {
             $event.preventDefault();
@@ -69,8 +68,6 @@
                     let request = new XMLHttpRequest();
                     request.open('PUT', `http://localhost:3000/api/${this.id}`);
                     request.setRequestHeader('Authorization', 'Bearer ' + key);
-                    // request.setRequestHeader('Content-Type', 'multipart/form-data');
-                    // console.log(post);
                     request.send(formData);
                     request.onreadystatechange = () => {
                         if (request.readyState == 4) {
@@ -83,10 +80,6 @@
                         }
                     }
                 })
-        },
-        test() {
-            console.log('THE TITLE: ', this.title[0]);
-            console.log('THE CAPTION: ', this.caption[0]);
         }
     }
 }

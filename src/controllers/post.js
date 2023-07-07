@@ -8,7 +8,6 @@ const fs = require('fs');
 exports.see = (req, res, next) => {
     Post.findOne({ _id: req.params.id }).then(
         (post) => {
-            // console.log('USERS SEEN ARRAY', req.body);
             post.usersSeen.push(req.body.userId);
             Post.updateOne({ _id: req.params.id }, post).then(
                 () => {
@@ -38,7 +37,6 @@ exports.see = (req, res, next) => {
 exports.likePost = (req, res, next) => {
     Post.findOne({ _id: req.params.id }).then(
         (post) => {
-            console.log(post);
             if (req.body.like == 1) {
                     post.likes++;
                     post.usersLiked.push(req.body.userId);
@@ -80,10 +78,8 @@ exports.likePost = (req, res, next) => {
 
 exports.createPost = (req, res, next) => {
     const url = req.protocol + '://' + req.get('host');
-    console.log('Request file: ', req.file);
     const postBody = JSON.parse(req.body.post);
     if (req.file) {
-        console.log('WITH FILE: ');
         const post = new Post({
             title: postBody.title,
             username: postBody.username,
@@ -109,7 +105,6 @@ exports.createPost = (req, res, next) => {
             }
         );
     } else {
-        console.log('WITHOUT FILE: ');
         const post = new Post({
             title: postBody.title,
             username: postBody.username,
@@ -168,7 +163,20 @@ exports.updatePost = (req, res, next) => {
             caption: postBody.caption,
             image: url + '/' + req.file.path,
         };
-
+        Post.findOne({ _id: req.params.id }).then(
+            (post) => {
+                const filename = post.image.split('/images/')[1];
+                fs.unlink('images/' + filename, () => {
+                    console.log('Image Deleted!');
+                });
+            }
+        ).catch(
+            (error) => {
+                res.status(400).json({
+                    error: error
+                });
+            }
+        )
     } else {
         post = {
             title: postBody.title,

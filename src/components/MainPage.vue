@@ -93,15 +93,11 @@ export default {
         editingPost(postId) {
             // this.whichPostIndexEditing = this.postArray.find(post => post._id === postId);
             this.whichPostEditing = postId;
-            // console.log(this.whichPostIndexEditing);
             this.editingPostNow = true;
-            console.log(postId);
-            console.log(this.whichPostEditing);
 
         }
     },
     created: function() {
-        console.log(this.userId);
         let key = localStorage.getItem('validToken');
             return new Promise((resolve, reject) => {
                 let request = new XMLHttpRequest();
@@ -112,7 +108,6 @@ export default {
                     if (request.readyState == 4) {
                         if (request.status === 200 || request.status === 201) {
                             this.postArray = (JSON.parse(request.response));
-                            console.log(JSON.parse(request.response));
                             resolve(JSON.parse(request.response));
                         } else {
                             reject(JSON.parse(request.response));

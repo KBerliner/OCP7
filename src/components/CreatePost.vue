@@ -42,7 +42,6 @@
         },
         methods: {
             handleFileUpload($event) {
-                console.log('File: ', $event.target.files[0]);
                 this.imgUrl = $event.target.files[0];
             },
             back() {
@@ -53,7 +52,6 @@
                 let form = document.getElementById('form');
                 const formData = new FormData();
                 
-                console.log('FILE: ', this.imgUrl);
                 this.$emit('createdPost');
                 let post = JSON.stringify({
                     title: this.title[0],
@@ -65,17 +63,12 @@
                 formData.append("post", post);
                 formData.append("image", this.imgUrl);
 
-                console.log('FORM DATA: ', formData.size);
-
-                console.log('USER ID: ', this.userId);
-                console.log('PROPS: ', `Title: ${this.title[0]} | Caption: ${this.caption[0]}`);
                 return new Promise((resolve, reject) => {
                     let key = 'eyJhbGciOiJIUzI1NiJ9.e30.QXKHqZhQAO4ZOTEDRNAxc4CD1jblcF_BakFSjA3srJc';
                     let request = new XMLHttpRequest();
                     request.open('POST', 'http://localhost:3000/api/');
                     request.setRequestHeader('Authorization', 'Bearer ' + key);
                     // request.setRequestHeader('Content-Type', 'multipart/form-data');
-                    console.log(post);
                     request.send(formData);
                     request.onreadystatechange = () => {
                         if (request.readyState == 4) {
